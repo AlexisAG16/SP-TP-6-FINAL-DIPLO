@@ -17,7 +17,16 @@ export const ObrasProvider = ({ children }) => { // ⬅️ Nombre del Provider
     const fetchObras = async () => {
       try {
         const { data } = await getObras();
-        setObrasList(data);
+        // Normalize backend fields to the frontend-friendly shape
+        const normalized = (data || []).map(o => ({
+          ...o,
+          tipo: o.tipo || o.tipo_obra || '',
+            anioPublicacion: o.anioPublicacion || o.anio_publicacion || o.anio || '',
+            imagen: o.imagen || o.imagenUrl || '',
+            genero: o.genero || '',
+          sinopsis: o.sinopsis || ''
+        }));
+        setObrasList(normalized);
         // 🟢 TOAST: Éxito en la carga inicial
         toast.success("Obras cargadas con éxito."); 
       } catch (error) {
@@ -34,10 +43,29 @@ export const ObrasProvider = ({ children }) => { // ⬅️ Nombre del Provider
   // Crear una nueva obra
   const handleCreateObra = useCallback(async (newObraData) => { // ⬅️ Función de creación
     try {
-        const { data } = await createObra(newObraData);
-        setObrasList(prev => [...prev, data]);
+      // Map frontend form fields to backend names
+      const payload = {
+        ...newObraData,
+        tipo_obra: newObraData.tipo || newObraData.tipo_obra,
+        anio_publicacion: newObraData.anioPublicacion ?? newObraData.anio_publicacion,
+        imagen: newObraData.imagenUrl || newObraData.imagen,
+        genero: newObraData.genero,
+        sinopsis: newObraData.sinopsis
+      };
+
+      const { data } = await createObra(payload);
+      // Normalize returned data too
+      const d = {
+        ...data,
+        tipo: data.tipo || data.tipo_obra || '',
+        anioPublicacion: data.anioPublicacion || data.anio_publicacion || data.anio || '',
+        imagen: data.imagen || data.imagenUrl || '',
+        genero: data.genero || '',
+        sinopsis: data.sinopsis || ''
+      };
+        setObrasList(prev => [...prev, d]);
         // 🟢 TOAST: Éxito al crear
-        toast.success(`Obra "${data.titulo}" creada con éxito.`);
+        toast.success(`Obra "${d.titulo}" creada con éxito.`);
         return true;
     } catch (error) {
         const errorMessage = error.response?.data?.message || "Error al crear la obra.";
@@ -51,12 +79,31 @@ export const ObrasProvider = ({ children }) => { // ⬅️ Nombre del Provider
   // Actualizar una obra existente
   const handleUpdateObra = useCallback(async (id, updatedData) => { // ⬅️ Función de actualización
     try {
-        const { data } = await updateObra(id, updatedData);
+        const payload = {
+          ...updatedData,
+          tipo_obra: updatedData.tipo || updatedData.tipo_obra,
+          anio_publicacion: updatedData.anioPublicacion ?? updatedData.anio_publicacion,
+          imagen: updatedData.imagenUrl || updatedData.imagen,
+          genero: updatedData.genero,
+          sinopsis: updatedData.sinopsis
+        };
+
+        const { data } = await updateObra(id, payload);
+        // Normalize returned updated object
+        const updated = {
+          ...data,
+          tipo: data.tipo || data.tipo_obra || '',
+          anioPublicacion: data.anioPublicacion || data.anio_publicacion || data.anio || '',
+          imagen: data.imagen || data.imagenUrl || '',
+          genero: data.genero || '',
+          sinopsis: data.sinopsis || ''
+        };
+
         setObrasList(prev => prev.map(obra => 
-            (obra._id || obra.id) === id ? data : obra
+            (obra._id || obra.id) === id ? updated : obra
         ));
         // 🟢 TOAST: Éxito al actualizar
-        toast.success(`Obra "${data.titulo}" actualizada con éxito.`);
+        toast.success(`Obra "${updated.titulo}" actualizada con éxito.`);
         return true;
     } catch (error) {
         const errorMessage = error.response?.data?.message || "Error al actualizar la obra.";

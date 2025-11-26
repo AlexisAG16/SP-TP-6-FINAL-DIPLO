@@ -11,7 +11,8 @@ const ObraSchema = new mongoose.Schema({
     },
     tipo_obra: { 
         type: String, 
-        enum: ['Libro/Saga', 'Película', 'Serie de Televisión', 'Otro'], 
+        // Hacemos el enum más permisivo para coincidir con lo que usa el frontend
+        enum: ['Libro', 'Libro/Saga', 'Película', 'Serie', 'Serie de Televisión', 'Juego', 'Otros', 'Otro'], 
         required: true 
     },
     anio_publicacion: { 
@@ -22,6 +23,7 @@ const ObraSchema = new mongoose.Schema({
         type: String, 
         required: true 
     },
+    imagen: { type: String, default: 'https://placehold.co/400x400/374151/ffffff?text=FANTASY' },
     sinopsis: { 
         type: String, 
         required: true 

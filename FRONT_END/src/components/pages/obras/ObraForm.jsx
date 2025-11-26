@@ -9,9 +9,10 @@ import { ObrasContext } from '../../context/ObrasContext'; // ⬅️ Contexto de
 const initialFormState = { 
   titulo: '',
   tipo: 'Libro', 
-  autor: '',
   anioPublicacion: '', // Se enviará como número
   imagenUrl: 'https://loremflickr.com/320/240/book,fantasy', 
+  genero: '',
+  sinopsis: '',
 };
 
 // 🟢 FUNCIÓN DE VALIDACIÓN CON TOASTS
@@ -27,14 +28,20 @@ const validateForm = (form) => {
     toast.error('El tipo de obra (Libro, Serie, etc.) es obligatorio.');
     isValid = false;
   }
-  if (!form.autor.trim()) {
-    toast.error('El nombre del autor o creador es obligatorio.');
-    isValid = false;
-  }
   // Validación de año
   const anio = parseInt(form.anioPublicacion);
   if (isNaN(anio) || anio < 1000 || anio > currentYear) {
     toast.error(`El año de publicación debe ser un valor numérico entre 1000 y ${currentYear}.`);
+    isValid = false;
+  }
+
+  if (!form.genero.trim()) {
+    toast.error('El género es obligatorio.');
+    isValid = false;
+  }
+
+  if (!form.sinopsis.trim()) {
+    toast.error('La sinopsis es obligatoria.');
     isValid = false;
   }
 
@@ -65,6 +72,8 @@ const ObraForm = ({ obraToEdit }) => { // ⬅️ Nombre del componente
         ...obraToEdit,
         // Aseguramos que el año sea un string para el input de tipo 'number'
         anioPublicacion: String(obraToEdit.anioPublicacion || ''), 
+        genero: obraToEdit.genero || '',
+        sinopsis: obraToEdit.sinopsis || '',
       });
     }
   }, [obraToEdit]);
@@ -159,19 +168,7 @@ const ObraForm = ({ obraToEdit }) => { // ⬅️ Nombre del componente
           </select>
         </div>
 
-        {/* Campo Autor */}
-        <div>
-          <label htmlFor="autor" className={labelClass}>Autor/Creador *</label>
-          <input
-            type="text"
-            id="autor"
-            name="autor"
-            value={form.autor}
-            onChange={handleChange}
-            className={inputClass}
-            placeholder="Ej: Stephen King o el nombre del Director"
-          />
-        </div>
+        {/* Nota: eliminamos el campo Autor/Creador — se usa 'genero' en su lugar */}
 
         {/* Campo Año de Publicación */}
         <div>
@@ -213,6 +210,33 @@ const ObraForm = ({ obraToEdit }) => { // ⬅️ Nombre del componente
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Preview</p>
             </div>
           )}
+        </div>
+
+        {/* Campo Género */}
+        <div>
+          <label htmlFor="genero" className={labelClass}>Género *</label>
+          <input
+            type="text"
+            id="genero"
+            name="genero"
+            value={form.genero}
+            onChange={handleChange}
+            className={inputClass}
+            placeholder="Ej: Fantasía, Terror, Aventura"
+          />
+        </div>
+
+        {/* Campo Sinopsis */}
+        <div>
+          <label htmlFor="sinopsis" className={labelClass}>Sinopsis *</label>
+          <textarea
+            id="sinopsis"
+            name="sinopsis"
+            value={form.sinopsis}
+            onChange={handleChange}
+            className={inputClass + ' h-24 resize-none'}
+            placeholder="Breve sinopsis de la obra..."
+          />
         </div>
         
         {/* Botones de acción */}

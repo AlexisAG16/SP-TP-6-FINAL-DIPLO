@@ -5,19 +5,23 @@ import * as authService from '../services/auth.service.mjs';
 // POST /api/auth/register
 export const registerUser = async (req, res) => {
     try {
-        const { nombre, email, password } = req.body;
+        const { nombre, email, password, adminCode } = req.body;
         
         if (!nombre || !email || !password) {
             return res.status(400).json({ message: 'Por favor, introduce nombre, email y contraseña.' });
         }
 
-        const data = await authService.register({ nombre, email, password });
+        const data = await authService.register({ nombre, email, password, adminCode });
         res.status(201).json(data);
     } catch (error) {
         console.error('Error en registerUser:', error);
         // Si el error viene de Mongo por clave duplicada -> 409 Conflict
         if (error.code === 11000 || /ya existe/i.test(error.message)) {
             return res.status(409).json({ message: error.message });
+        }
+        // Si intentaron crear admin con código inválido o la app no permite admin -> 403 Forbidden
+        if (/admin|Código de administrador inválido|ADMIN_SECRET/i.test(error.message)) {
+            return res.status(403).json({ message: error.message });
         }
         // Errores de validación
         if (error.name === 'ValidationError') {

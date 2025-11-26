@@ -4,7 +4,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 
 const Register = () => {
-    const [userData, setUserData] = useState({ nombre: '', email: '', password: '' });
+    const [userData, setUserData] = useState({ nombre: '', email: '', password: '', adminCode: '' });
+    const [isAdminMode, setIsAdminMode] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { register, isLoggedIn } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -34,7 +35,11 @@ const Register = () => {
             return;
         }
 
-        const success = await register(userData);
+        // Si el usuario eligió crear un admin, incluimos adminCode
+        const payload = { ...userData };
+        if (!isAdminMode) delete payload.adminCode; // remove adminCode if not intended
+
+        const success = await register(payload);
         
         setIsSubmitting(false);
 
@@ -108,6 +113,33 @@ const Register = () => {
                             placeholder="Define una contraseña segura"
                         />
                     </div>
+
+                    {/* Opcional: Crear como admin usando un código secreto */}
+                    <div className="flex items-center space-x-3">
+                        <input
+                            id="isAdminMode"
+                            type="checkbox"
+                            checked={isAdminMode}
+                            onChange={() => setIsAdminMode(prev => !prev)}
+                            className="w-4 h-4"
+                        />
+                        <label htmlFor="isAdminMode" className="text-sm text-gray-700 dark:text-gray-300">Crear como administrador</label>
+                    </div>
+
+                    {isAdminMode && (
+                        <div>
+                            <label htmlFor="adminCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Código de Admin (secreto)</label>
+                            <input
+                                type="password"
+                                id="adminCode"
+                                name="adminCode"
+                                value={userData.adminCode}
+                                onChange={(e) => setUserData({ ...userData, adminCode: e.target.value })}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 transition"
+                                placeholder="Código secreto para crear un admin"
+                            />
+                        </div>
+                    )}
 
                     <button
                         type="submit"

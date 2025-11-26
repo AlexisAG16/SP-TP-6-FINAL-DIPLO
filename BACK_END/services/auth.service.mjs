@@ -10,23 +10,35 @@ const generateToken = (id) => {
     });
 };
 
-export const register = async ({ nombre, email, password }) => {
-    // Normalizar campos
+export const register = async ({ nombre, email, password, adminCode }) => {
     email = email?.toLowerCase().trim();
     nombre = nombre?.trim();
 
-    // 1. Verificar si el usuario ya existe (lógica de negocio)
     const userExists = await authRepository.findUserByEmail(email);
     if (userExists) {
         throw new Error('El usuario ya existe con ese email.');
     }
     
-    // 2. Crear usuario (llama al repositorio, que usa el modelo con bcrypt)
     let newUser;
     try {
-        newUser = await authRepository.createUser({ nombre, email, password });
+        const payload = { nombre, email, password };
+        if (adminCode) {
+            if (!process.env.ADMIN_SECRET) {
+                throw new Error('Registro como admin no permitido en esta instancia (ADMIN_SECRET no definido).');
+            }
+            if (adminCode !== process.env.ADMIN_SECRET) {
+                throw new Error('Código de administrador inválido.');
+            }
+
+            const adminCount = await authRepository.countAdmins();
+            if (adminCount > 0) {
+                throw new Error('Ya existe un administrador. Solo se permite un único usuario admin.');
+            }
+            payload.rol = 'admin';
+        }
+
+        newUser = await authRepository.createUser(payload);
     } catch (err) {
-        // Si Mongo lanza un error por duplicado, mapearlo
         if (err && err.code === 11000) {
             throw new Error('El usuario ya existe con ese email.');
         }
@@ -36,7 +48,6 @@ export const register = async ({ nombre, email, password }) => {
     // 3. Generar token
     const token = generateToken(newUser._id);
 
-    // 4. Devolver la data (sin la contraseña hasheada)
     const userResponse = { 
         id: newUser._id, 
         nombre: newUser.nombre, 

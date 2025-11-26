@@ -61,7 +61,7 @@ const ObraDetail = () => {
                 <div className="md:w-2/3">
                     <DetailRow label="Tipo de Obra" value={obra.tipo || 'Desconocido'} />
                     <DetailRow label="Año de Publicación" value={obra.anioPublicacion || 'N/A'} />
-                    <DetailRow label="Autor/Director" value={obra.autor || 'N/A'} />
+                    <DetailRow label="Género" value={obra.genero || 'N/A'} />
                     
                     <div className="mt-6">
                         <h3 className="text-2xl font-semibold mb-2 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">Sinopsis:</h3>

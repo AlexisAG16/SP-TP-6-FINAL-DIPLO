@@ -6,6 +6,10 @@ export const findUserByEmail = async (email) => {
     return User.findOne({ email });
 };
 
+export const countAdmins = async () => {
+    return User.countDocuments({ rol: 'admin' });
+};
+
 export const createUser = async (userData) => {
     // La encriptación ocurre en el middleware 'pre-save' del modelo.
     return User.create(userData);

@@ -31,13 +31,10 @@ const ObraCard = ({ obra }) => {
             {obra.titulo}
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Autor: <span className='font-semibold'>{obra.autor}</span>
+            Año: {obra.anioPublicacion || obra.anio || 'N/A'}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Año: {obra.anio}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Género: {obra.genero}
+            Género: <span className='font-semibold'>{obra.genero || 'N/A'}</span>
           </p>
         </div>
 

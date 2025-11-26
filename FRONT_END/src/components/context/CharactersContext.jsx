@@ -33,8 +33,10 @@ export const CharactersProvider = ({ children }) => {
     const fetchCharacters = async () => {
       try {
         const { data } = await getCharacters();
+        // La API puede devolver un objeto { personajes: [], meta: {} } o directamente un array.
+        const raw = Array.isArray(data) ? data : (data?.personajes || []);
         // Asumiendo que `poderes` puede ser un string separado por comas, lo convertimos a array si es necesario
-        const charactersWithArrayPowers = data.map(char => ({
+        const charactersWithArrayPowers = (raw || []).map(char => ({
           ...char,
           poderes: Array.isArray(char.poderes) 
             ? char.poderes 

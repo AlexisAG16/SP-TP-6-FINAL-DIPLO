@@ -148,7 +148,7 @@ const CharacterForm = ({ characterToEdit }) => {
             {obrasList.map((media) => (
               // El valor enviado al backend debe ser el ID de la obra
               <option key={media._id} value={media._id}>
-                {media.titulo} ({media.anio_publicacion})
+                {media.titulo} ({media.anioPublicacion || media.anio_publicacion || 'N/A'})
               </option>
             ))}
           </select>

@@ -34,12 +34,14 @@ const Navbar = () => {
           >
               Personajes
           </NavLink>
-            <NavLink 
-              to="/obras" 
-              className={({ isActive }) => `${linkClass} ${isActive ? activeClass : ''}`}
-            >
-              Obras
-            </NavLink>
+            {user?.rol === 'admin' && (
+              <NavLink 
+                to="/obras" 
+                className={({ isActive }) => `${linkClass} ${isActive ? activeClass : ''}`}
+              >
+                Obras
+              </NavLink>
+            )}
           <NavLink 
               to="/about-us" 
               className={({ isActive }) => `${linkClass} ${isActive ? activeClass : ''}`}

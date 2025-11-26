@@ -9,7 +9,10 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true, minlength: 6 },
     rol: { type: String, enum: ['user', 'admin'], default: 'user' }
 }, {
-    timestamps: true 
+    timestamps: true,
+    // Fijamos explícitamente el nombre de la colección en español para
+    // coincidir con la base de datos existente: 'usuarios'
+    collection: 'usuarios'
 });
 
 // Middleware para hashear la contraseña

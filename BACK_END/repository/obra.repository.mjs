@@ -4,7 +4,9 @@ import Obra from '../models/obra.model.mjs';
 
 // CREADO PREVIAMENTE: Obtener TODAS las obras (para el SELECT)
 export const findAllObras = async () => {
-    return Obra.find({}, '_id titulo anio_publicacion')
+    // Devolvemos campos más completos para que el frontend pueda renderizar la lista sin tener
+    // que pedir cada obra por separado.
+    return Obra.find({}, '_id titulo tipo_obra anio_publicacion genero imagen sinopsis')
                .sort({ titulo: 1 });
 };
 
